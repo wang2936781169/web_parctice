@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.1)
 #variable set begin
 set(PRJ_NAME "web_practice")
 set(COMMON "./common")
-set(TEMPLATE "./template")
 set(SOCKET "./socket")
 set(THREAD_POOL "./thread_pool")
 set(TEST_PARAM "test dir" CACHE INTERNAL "test dir description")
@@ -18,7 +17,6 @@ add_compile_options(-g -std=c++17 -Wall)
 
 #sub directory add begin
 add_subdirectory(${COMMON})
-add_subdirectory(${TEMPLATE})
 add_subdirectory(${THREAD_POOL})
 add_subdirectory(${SOCKET})
 #sub directory add end
@@ -29,7 +27,6 @@ add_executable(${PRJ_NAME} main.cpp)
 
 #package include begin
 FIND_PACKAGE(Threads)
-target_include_directories(${PRJ_NAME} PRIVATE ${TEMPLATE_DIR})
 target_include_directories(${PRJ_NAME} PRIVATE ${COMMON_DIR})
 target_include_directories(${PRJ_NAME} PRIVATE ${SOCK_DIR})
 #package include end

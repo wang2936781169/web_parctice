@@ -141,7 +141,7 @@ const std::string TCPServer::Recv(const std::shared_ptr<TCPServer::ClientInfo> _
 
     while (true)
     {
-        size_t ret = recv(_client->clientFd, buf, BUFSIZ, 0);
+        int ret = recv(_client->clientFd, buf, BUFSIZ, 0);
         if(ret == -1)
         {
             if(errno == EINTR) continue;
@@ -163,7 +163,7 @@ const std::string TCPServer::Recv(const std::shared_ptr<TCPServer::ClientInfo> _
     size_t right = n;
     while(left < right)
     {
-        size_t ret = recv(_client->clientFd, buf + left, right - left, 0);
+        int ret = recv(_client->clientFd, buf + left, right - left, 0);
         if(ret == -1)
         {
             if(errno == EINTR) continue;
@@ -181,7 +181,7 @@ const std::string TCPServer::Recv(const std::shared_ptr<TCPServer::ClientInfo> _
 const short TCPServer::RecvOne(const std::shared_ptr<TCPServer::ClientInfo> _client, char& c)
 {
     static std::string str_buf;
-    static int left = 0;
+    static size_t left = 0;
 
     if(str_buf.size() == left)
     {
@@ -228,7 +228,7 @@ void TCPServer::Send(const std::shared_ptr<TCPServer::ClientInfo> _client, const
     size_t cur = 0;
     while(cur < str.size())
     {
-        size_t ret = send(_client->clientFd, buf + cur, str.size() - cur, 0);
+        int ret = send(_client->clientFd, buf + cur, str.size() - cur, 0);
         if(ret == -1)
         {
             if(errno == EINTR) continue;
