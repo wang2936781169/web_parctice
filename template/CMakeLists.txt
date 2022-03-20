@@ -1,0 +1,1 @@
+set(TEMPLATE_DIR "${PROJECT_SOURCE_DIR}/template/include" CACHE INTERNAL "template directory path")
