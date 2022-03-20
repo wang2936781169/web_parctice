@@ -10,6 +10,8 @@ add_library(${THREADPOLL_LIB} SHARED "src/thread_pool.cpp")
 target_include_directories(${THREADPOLL_LIB} PRIVATE ${TEMPLATE_DIR})
 target_include_directories(${THREADPOLL_LIB} PRIVATE ${COMMON_LIB})
 target_include_directories(${THREADPOLL_LIB} PRIVATE ${THREADPOLL_DIR})
+FIND_PACKAGE(Threads)
 
 #add lib
 target_link_libraries(${THREADPOLL_LIB} PRIVATE ${COMMON_LIB})
+target_link_libraries(${THREADPOLL_LIB} PRIVATE ${CMAKE_THREAD_LIBS_INIT})

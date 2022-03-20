@@ -3,4 +3,19 @@
 
 #include <template.hpp>
 
+#include <mutex>
+
+class ThreadPool : public Instance<ThreadPool>
+{
+public:
+    ThreadPool();
+    void beginThread();
+
+private:
+    void coutTest();
+    
+private:
+    std::mutex mtx;
+};
+
 #endif
