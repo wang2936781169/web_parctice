@@ -1,31 +1,80 @@
 #include <thread_pool.hpp>
 
 #include <iostream>
+
+#include <vector>
+#include <queue>
+
 #include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
 #include <chrono>
 
-ThreadPool::ThreadPool()
+struct ThreadPool::ThreadPoolImpl
 {
+    std::atomic<bool> finished;
+    const size_t max_thread_num = 10;
+
+    //tasks
+    std::queue<std::function<void()>> tasks;
+
+    //threads
+    std::vector<std::thread> threas;
+
+    //mutex
+    std::mutex mtx;
+    std::condition_variable cnv;
+};
+
+ThreadPool::ThreadPool()
+    : Instance<ThreadPool>()
+    , PImpl(new ThreadPoolImpl)
+{
+    PImpl->finished.store(true);
 }
 
-void ThreadPool::beginThread()
+ThreadPool::~ThreadPool()
 {
-    for(size_t i=0 ; i<10 ; ++i)
+    PImpl->finished.store(true);
+    PImpl->cnv.notify_all();
+
+    for(size_t i=0 ; i<PImpl->threas.size() ; ++i)
     {
-        std::thread t(&ThreadPool::coutTest, this);
-        t.detach();
+        PImpl->threas[i].join();
     }
 }
 
-void ThreadPool::coutTest()
+void ThreadPool::start()
 {
-    while(true)
+    PImpl->finished.store(false);
+    for(size_t i=0 ; i<PImpl->max_thread_num ; ++i)
     {
-        this->mtx.lock();
-        {
-            std::cout << "test pid = " << std::this_thread::get_id() << std::endl;
-        }
-        this->mtx.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        PImpl->threas.emplace_back(&ThreadPool::workThread, &ThreadPool::get());
+    }
+}
+
+void ThreadPool::setData(std::function<void()>&& func)
+{
+    std::unique_lock<std::mutex> lock(PImpl->mtx);
+    PImpl->tasks.emplace(func);
+    PImpl->cnv.notify_one();
+}
+
+void ThreadPool::workThread()
+{
+    while(!PImpl->finished.load())
+    {
+        std::unique_lock<std::mutex> lock(PImpl->mtx);
+        PImpl->cnv.wait(lock, [this]() { return PImpl->finished.load() || !PImpl->tasks.empty(); });
+        if(PImpl->finished.load()) return ;
+
+        std::function<void()> func = PImpl->tasks.front();
+        PImpl->tasks.pop();
+
+        lock.unlock();
+
+        func();
     }
 }

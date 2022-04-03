@@ -9,18 +9,22 @@ protected:
     ~NoCopy() = default;
 
 private:
-    NoCopy& operator=(const NoCopy&) = delete;
-    NoCopy(const NoCopy&) = delete;
+    NoCopy& operator=(const NoCopy&);
+    NoCopy(const NoCopy&);
 };
 
-template<class T>
-class Instance : private NoCopy<T>
+template <class T>
+class Instance : public NoCopy<T>
 {
 public:
-    static T& get() { static T instance; return instance; }
+    static T& get() 
+    { 
+        static T instance; 
+        return instance; 
+    }
 
 protected:
-    Instance() {};
+    Instance() = default;
     ~Instance() = default;
 };
 

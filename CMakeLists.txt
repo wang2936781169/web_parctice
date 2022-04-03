@@ -27,6 +27,10 @@ add_subdirectory(${SOCKET})
 add_executable(${PRJ_NAME} main.cpp)
 #exec export end
 
+#macro begin
+add_definitions(-DThreadReturn)
+#macro end
+
 #package include begin
 target_include_directories(${PRJ_NAME} PRIVATE ${COMMON_DIR})
 target_include_directories(${PRJ_NAME} PRIVATE ${TEMPLATE_DIR})
